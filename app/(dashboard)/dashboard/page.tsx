@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
+import { apolloClient } from "@/lib/apollo-client";
+import { ME_QUERY } from "@/graphql/queries/me";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -10,12 +13,28 @@ export default function DashboardPage() {
   const checkAuth = useAuthStore((s) => s.checkAuth);
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
 
   useEffect(() => {
     checkAuth();
     if (!isAuthenticated) {
       router.replace("/sign-in");
     }
+    // Hidratar con datos reales del backend (me)
+    (async () => {
+      try {
+        const { data } = await apolloClient.query<{ me: any }>({ query: ME_QUERY, fetchPolicy: "no-cache" });
+        if (data?.me) {
+          setUser(data.me);
+        } else {
+          logout();
+          router.replace("/sign-in");
+        }
+      } catch (e) {
+        logout();
+        router.replace("/sign-in");
+      }
+    })();
   }, [isAuthenticated, checkAuth, router]);
 
   if (!isAuthenticated) return null;
@@ -24,12 +43,15 @@ export default function DashboardPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <button
-          onClick={() => { logout(); router.replace("/sign-in"); }}
-          className="px-4 py-2 rounded bg-black text-white"
-        >
-          Cerrar sesión
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/products" className="px-4 py-2 rounded border">Productos</Link>
+          <button
+            onClick={() => { logout(); router.replace("/sign-in"); }}
+            className="px-4 py-2 rounded bg-black text-white"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
       <p className="text-gray-700 mb-2">Sesión activa.</p>
       {/* Texto simple para identificar el dashboard según rol */}
