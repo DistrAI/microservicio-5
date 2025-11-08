@@ -327,7 +327,7 @@ export default function OrdersPage() {
         <button
           onClick={() => handleFilterChange("")}
           className={`px-3 py-1 rounded text-sm ${
-            filterEstado === "" ? "bg-blue-600 text-white" : "border hover:bg-gray-50"
+            filterEstado === "" ? "bg-black text-white" : "border hover:bg-gray-50"
           }`}
         >
           Todos
@@ -337,7 +337,7 @@ export default function OrdersPage() {
             key={estado.value}
             onClick={() => handleFilterChange(estado.value)}
             className={`px-3 py-1 rounded text-sm ${
-              filterEstado === estado.value ? "bg-blue-600 text-white" : "border hover:bg-gray-50"
+              filterEstado === estado.value ? "bg-black text-white" : "border hover:bg-gray-50"
             }`}
           >
             {estado.label}
@@ -350,7 +350,7 @@ export default function OrdersPage() {
         <div className="mb-6">
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
           >
             {showCreateForm ? "Cancelar" : "Crear Pedido"}
           </button>
@@ -359,50 +359,59 @@ export default function OrdersPage() {
 
       {/* ADMIN Create Form */}
       {isAdmin && showCreateForm && (
-        <div className="mb-8 p-4 border rounded bg-gray-50">
-          <h2 className="text-lg font-medium mb-4">Crear Nuevo Pedido</h2>
+        <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Crear Nuevo Pedido</h2>
           <form onSubmit={handleCreateOrder} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select
-                value={form.clienteId}
-                onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccionar cliente</option>
-                {clientes.map((cliente) => (
-                  <option key={cliente.id} value={cliente.id}>
-                    {cliente.nombre} - {cliente.email}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Dirección de entrega"
-                value={form.direccionEntrega}
-                onChange={(e) => setForm({ ...form, direccionEntrega: e.target.value })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Cliente</label>
+                <select
+                  value={form.clienteId}
+                  onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  required
+                >
+                  <option value="">Seleccionar cliente...</option>
+                  {clientes.map((cliente) => (
+                    <option key={cliente.id} value={cliente.id}>
+                      {cliente.nombre} - {cliente.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Dirección de entrega</label>
+                <input
+                  type="text"
+                  placeholder="Ej: Av. Siempre Viva 123"
+                  value={form.direccionEntrega}
+                  onChange={(e) => setForm({ ...form, direccionEntrega: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Observaciones (opcional)</label>
+              <textarea
+                placeholder="Notas para el repartidor o consideraciones"
+                value={form.observaciones}
+                onChange={(e) => setForm({ ...form, observaciones: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                rows={2}
               />
             </div>
-            <textarea
-              placeholder="Observaciones (opcional)"
-              value={form.observaciones}
-              onChange={(e) => setForm({ ...form, observaciones: e.target.value })}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={2}
-            />
 
             {/* Items */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">Items del Pedido</h3>
+                <h3 className="font-medium text-gray-900">Items del Pedido</h3>
                 <button
                   type="button"
                   onClick={addItem}
-                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-3 py-1 text-sm bg-black text-white rounded hover:bg-gray-900"
                 >
-                  Agregar Item
+                  Agregar item
                 </button>
               </div>
               
@@ -411,46 +420,47 @@ export default function OrdersPage() {
                 const subtotal = selectedProduct ? selectedProduct.precio * item.cantidad : 0;
                 
                 return (
-                  <div key={index} className="flex gap-2 items-center p-3 border rounded-lg bg-gray-50">
-                    <div className="flex-1">
+                  <div key={index} className="flex gap-3 items-start p-3 border border-gray-200 rounded-md bg-white">
+                    <div className="flex-1 space-y-1">
+                      <label className="text-xs text-gray-700">Producto</label>
                       <select
                         value={item.productoId}
                         onChange={(e) => updateItem(index, "productoId", e.target.value)}
-                        className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                         required
                       >
-                        <option value="">🔍 Seleccionar producto...</option>
+                        <option value="">Seleccionar producto...</option>
                         {productos.map((producto) => (
                           <option key={producto.id} value={producto.id}>
-                            📦 {producto.nombre} - ${producto.precio}
+                            {producto.nombre} - ${producto.precio}
                           </option>
                         ))}
                       </select>
                       {selectedProduct && (
                         <div className="text-xs text-gray-600 mt-1">
-                          💰 Precio unitario: ${selectedProduct.precio} | 📊 Subtotal: ${subtotal.toFixed(2)}
+                          Precio unitario: ${selectedProduct.precio} · Subtotal: ${subtotal.toFixed(2)}
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col items-center">
-                      <label className="text-xs text-gray-600 mb-1">Cantidad</label>
+                    <div className="flex flex-col items-start">
+                      <label className="text-xs text-gray-700 mb-1">Cantidad</label>
                       <input
                         type="number"
                         placeholder="1"
                         min="1"
                         value={item.cantidad}
                         onChange={(e) => updateItem(index, "cantidad", parseInt(e.target.value) || 1)}
-                        className="w-20 px-2 py-1 border rounded text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                         required
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => removeItem(index)}
-                      className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none"
                       title="Eliminar item"
                     >
-                      🗑️
+                      Eliminar
                     </button>
                   </div>
                 );
@@ -465,7 +475,7 @@ export default function OrdersPage() {
 
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="px-5 py-2 bg-black text-white rounded hover:bg-gray-900"
             >
               Crear Pedido
             </button>

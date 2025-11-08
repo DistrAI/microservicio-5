@@ -236,11 +236,11 @@ export default function ClientsPage() {
           placeholder="Buscar por nombre..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
         >
           Buscar
         </button>
@@ -257,47 +257,59 @@ export default function ClientsPage() {
 
       {/* ADMIN Form */}
       {isAdmin && (
-        <div className="mb-8 p-4 border rounded bg-gray-50">
-          <h2 className="text-lg font-medium mb-4">
+        <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
             {editingId ? "Editar Cliente" : "Crear Cliente"}
           </h2>
           <form onSubmit={editingId ? handleUpdate : handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Nombre completo"
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="tel"
-              placeholder="Teléfono"
-              value={form.telefono}
-              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Dirección"
-              value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <div className="md:col-span-2 flex gap-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Nombre completo</label>
+              <input
+                type="text"
+                placeholder="Nombre completo"
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Email</label>
+              <input
+                type="email"
+                placeholder="correo@dominio.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Teléfono</label>
+              <input
+                type="tel"
+                placeholder="Ej: +56 9 1234 5678"
+                value={form.telefono}
+                onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Dirección</label>
+              <input
+                type="text"
+                placeholder="Calle, número, ciudad"
+                value={form.direccion}
+                onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                required
+              />
+            </div>
+            <div className="md:col-span-2 flex gap-2 pt-2">
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className="px-5 py-2 bg-black text-white rounded-md hover:bg-gray-900"
               >
                 {editingId ? "Actualizar" : "Crear"}
               </button>
@@ -305,7 +317,7 @@ export default function ClientsPage() {
                 <button
                   type="button"
                   onClick={cancelEdit}
-                  className="px-4 py-2 border rounded hover:bg-gray-50"
+                  className="px-5 py-2 border border-gray-400 text-gray-900 rounded-md hover:bg-gray-100"
                 >
                   Cancelar
                 </button>

@@ -147,24 +147,36 @@ export default function ProductsPage() {
             value={search}
             onChange={(e) => { setPage(0); setSearch(e.target.value); }}
             placeholder="Buscar por nombre"
-            className="border rounded px-2 py-1 text-sm"
+            className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
           />
           <div className="text-sm text-gray-500">Página {data ? data.page + 1 : page + 1} de {data?.totalPages ?? 1}</div>
         </div>
       </div>
 
       {isAdmin && (
-        <div className="mb-4 border rounded p-3">
-          <h2 className="font-medium mb-2">{editingId ? "Editar producto" : "Crear producto"}</h2>
-          <div className="grid md:grid-cols-4 gap-2">
-            <input className="border rounded px-2 py-1" placeholder="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
-            <input className="border rounded px-2 py-1" placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
-            <input className="border rounded px-2 py-1" placeholder="Precio" type="number" step="0.01" value={form.precio} onChange={(e) => setForm({ ...form, precio: e.target.value })} />
-            <input className="border rounded px-2 py-1" placeholder="Descripción" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+        <div className="mb-6 p-6 border border-gray-200 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">{editingId ? "Editar producto" : "Crear producto"}</h2>
+          <div className="grid md:grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Nombre</label>
+              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">SKU</label>
+              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Precio</label>
+              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Precio" type="number" step="0.01" value={form.precio} onChange={(e) => setForm({ ...form, precio: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-900">Descripción (opcional)</label>
+              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Descripción" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+            </div>
           </div>
-          <div className="mt-2 flex gap-2">
-            <button className="px-3 py-1 border rounded" onClick={submitForm} disabled={loading || !form.nombre || !form.sku || !form.precio}>Guardar</button>
-            {editingId && <button className="px-3 py-1 border rounded" onClick={resetForm}>Cancelar</button>}
+          <div className="mt-3 flex gap-2">
+            <button className="px-5 py-2 bg-black text-white rounded-md hover:bg-gray-900 disabled:opacity-50" onClick={submitForm} disabled={loading || !form.nombre || !form.sku || !form.precio}>Guardar</button>
+            {editingId && <button className="px-5 py-2 border border-gray-400 text-gray-900 rounded-md hover:bg-gray-100" onClick={resetForm}>Cancelar</button>}
           </div>
         </div>
       )}

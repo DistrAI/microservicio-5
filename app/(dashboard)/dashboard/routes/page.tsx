@@ -371,7 +371,7 @@ export default function RoutesPage() {
             <button
               onClick={() => handleFilterChange("estado", "")}
               className={`px-3 py-1 rounded text-sm ${
-                filterEstado === "" && filterRepartidor === "" ? "bg-blue-600 text-white" : "border hover:bg-gray-50"
+                filterEstado === "" && filterRepartidor === "" ? "bg-black text-white" : "border hover:bg-gray-50"
               }`}
             >
               Todas
@@ -381,7 +381,7 @@ export default function RoutesPage() {
                 key={estado.value}
                 onClick={() => handleFilterChange("estado", estado.value)}
                 className={`px-3 py-1 rounded text-sm ${
-                  filterEstado === estado.value ? "bg-blue-600 text-white" : "border hover:bg-gray-50"
+                  filterEstado === estado.value ? "bg-black text-white" : "border hover:bg-gray-50"
                 }`}
               >
                 {estado.label}
@@ -412,7 +412,7 @@ export default function RoutesPage() {
         <div className="mb-6">
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
           >
             {showCreateForm ? "Cancelar" : "Crear Ruta"}
           </button>
@@ -421,52 +421,62 @@ export default function RoutesPage() {
 
       {/* ADMIN Create Form */}
       {isAdmin && showCreateForm && (
-        <div className="mb-8 p-4 border rounded bg-gray-50">
-          <h2 className="text-lg font-medium mb-4">Crear Nueva Ruta</h2>
+        <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Crear Nueva Ruta</h2>
           <form onSubmit={handleCreateRoute} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select
-                value={form.repartidorId}
-                onChange={(e) => setForm({ ...form, repartidorId: e.target.value })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccionar repartidor</option>
-                {repartidores.map((repartidor) => (
-                  <option key={repartidor.id} value={repartidor.id}>
-                    {repartidor.nombreCompleto} - {repartidor.email}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="date"
-                value={form.fechaRuta}
-                onChange={(e) => setForm({ ...form, fechaRuta: e.target.value })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Distancia total (km) - opcional"
-                step="0.1"
-                value={form.distanciaTotalKm || ""}
-                onChange={(e) => setForm({ ...form, distanciaTotalKm: parseFloat(e.target.value) || 0 })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                placeholder="Tiempo estimado (min) - opcional"
-                value={form.tiempoEstimadoMin || ""}
-                onChange={(e) => setForm({ ...form, tiempoEstimadoMin: parseInt(e.target.value) || 0 })}
-                className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Repartidor</label>
+                <select
+                  value={form.repartidorId}
+                  onChange={(e) => setForm({ ...form, repartidorId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  required
+                >
+                  <option value="">Seleccionar repartidor</option>
+                  {repartidores.map((repartidor) => (
+                    <option key={repartidor.id} value={repartidor.id}>
+                      {repartidor.nombreCompleto} - {repartidor.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Fecha de ruta</label>
+                <input
+                  type="date"
+                  value={form.fechaRuta}
+                  onChange={(e) => setForm({ ...form, fechaRuta: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Distancia total (km) - opcional</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={form.distanciaTotalKm || ""}
+                  onChange={(e) => setForm({ ...form, distanciaTotalKm: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-900">Tiempo estimado (min) - opcional</label>
+                <input
+                  type="number"
+                  value={form.tiempoEstimadoMin || ""}
+                  onChange={(e) => setForm({ ...form, tiempoEstimadoMin: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                />
+              </div>
             </div>
 
             {/* Pedidos disponibles */}
             {pedidosDisponibles.length > 0 && (
               <div>
-                <h3 className="font-medium mb-2">Pedidos disponibles (opcional):</h3>
-                <div className="max-h-40 overflow-y-auto border rounded p-2">
+                <h3 className="font-medium text-gray-900 mb-2">Pedidos disponibles (opcional):</h3>
+                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-white">
                   {pedidosDisponibles.map((pedido) => (
                     <label key={pedido.id} className="flex items-center gap-2 p-1 hover:bg-gray-100">
                       <input
@@ -485,7 +495,7 @@ export default function RoutesPage() {
 
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="px-5 py-2 bg-black text-white rounded hover:bg-gray-900"
             >
               Crear Ruta
             </button>
@@ -533,7 +543,7 @@ export default function RoutesPage() {
                 <button
                   onClick={handleAssignPedidos}
                   disabled={assignPedidosIds.length === 0}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                  className="w-full px-4 py-2 bg-black text-white rounded hover:bg-gray-900 disabled:opacity-50"
                 >
                   Asignar {assignPedidosIds.length} Pedido(s)
                 </button>
