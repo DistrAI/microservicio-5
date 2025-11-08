@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
-import { apolloClient } from "@/lib/apollo-client";
-import { ME_QUERY } from "@/graphql/queries/me";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -20,21 +18,6 @@ export default function DashboardPage() {
     if (!isAuthenticated) {
       router.replace("/sign-in");
     }
-    // Hidratar con datos reales del backend (me)
-    (async () => {
-      try {
-        const { data } = await apolloClient.query<{ me: any }>({ query: ME_QUERY, fetchPolicy: "no-cache" });
-        if (data?.me) {
-          setUser(data.me);
-        } else {
-          logout();
-          router.replace("/sign-in");
-        }
-      } catch (e) {
-        logout();
-        router.replace("/sign-in");
-      }
-    })();
   }, [isAuthenticated, checkAuth, router]);
 
   if (!isAuthenticated) return null;

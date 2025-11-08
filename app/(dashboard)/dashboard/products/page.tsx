@@ -7,6 +7,7 @@ import { BUSCAR_PRODUCTOS_QUERY } from "@/graphql/queries/buscarProductos";
 import { CREAR_PRODUCTO_MUTATION, ACTUALIZAR_PRODUCTO_MUTATION, DESACTIVAR_PRODUCTO_MUTATION, ACTIVAR_PRODUCTO_MUTATION } from "@/graphql/mutations/productos";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Producto {
   id: string;
@@ -63,6 +64,7 @@ export default function ProductsPage() {
       }
     } catch (e: any) {
       setError("No se pudieron cargar los productos");
+      toast.error("No se pudieron cargar los productos");
       if (e?.message?.includes("acceso") || e?.message?.includes("autoriz")) {
         logout();
         router.replace("/sign-in");
@@ -101,13 +103,16 @@ export default function ProductsPage() {
       };
       if (editingId) {
         await apolloClient.mutate({ mutation: ACTUALIZAR_PRODUCTO_MUTATION, variables: { id: editingId, input: variables.input } });
+        toast.success("Producto actualizado");
       } else {
         await apolloClient.mutate({ mutation: CREAR_PRODUCTO_MUTATION, variables });
+        toast.success("Producto creado");
       }
       resetForm();
       fetchPage(page);
     } catch (e: any) {
       setError(e?.message || "Error al guardar el producto");
+      toast.error(e?.message || "Error al guardar el producto");
     } finally {
       setLoading(false);
     }
@@ -119,12 +124,15 @@ export default function ProductsPage() {
       setError(null);
       if (p.activo) {
         await apolloClient.mutate({ mutation: DESACTIVAR_PRODUCTO_MUTATION, variables: { id: p.id } });
+        toast.success("Producto desactivado");
       } else {
         await apolloClient.mutate({ mutation: ACTIVAR_PRODUCTO_MUTATION, variables: { id: p.id } });
+        toast.success("Producto activado");
       }
       fetchPage(page);
     } catch (e: any) {
       setError(e?.message || "Error al cambiar estado");
+      toast.error(e?.message || "Error al cambiar estado");
     } finally {
       setLoading(false);
     }
@@ -159,6 +167,10 @@ export default function ProductsPage() {
             {editingId && <button className="px-3 py-1 border rounded" onClick={resetForm}>Cancelar</button>}
           </div>
         </div>
+      )}
+
+      {loading && (
+        <div className="fixed inset-0 bg-black/10 pointer-events-none" />
       )}
 
       {loading && <p>Cargando...</p>}
