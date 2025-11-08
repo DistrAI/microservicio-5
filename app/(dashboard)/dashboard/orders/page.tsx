@@ -60,7 +60,6 @@ interface PedidoPage {
 interface ItemForm {
   productoId: string;
   cantidad: number;
-  precioUnitario?: number;
 }
 
 const ESTADOS_PEDIDO = [
@@ -184,7 +183,7 @@ export default function OrdersPage() {
   const addItem = () => {
     setForm({
       ...form,
-      items: [...form.items, { productoId: "", cantidad: 1, precioUnitario: 0 }]
+      items: [...form.items, { productoId: "", cantidad: 1 }]
     });
   };
 
@@ -204,7 +203,7 @@ export default function OrdersPage() {
   const calculateTotal = () => {
     return form.items.reduce((total, item) => {
       const producto = productos.find(p => p.id === item.productoId);
-      const precio = item.precioUnitario || producto?.precio || 0;
+      const precio = producto?.precio || 0;
       return total + (precio * item.cantidad);
     }, 0);
   };
@@ -219,14 +218,11 @@ export default function OrdersPage() {
     }
 
     try {
-      const itemsInput = form.items.map(item => {
-        const producto = productos.find(p => p.id === item.productoId);
-        return {
-          productoId: item.productoId,
-          cantidad: item.cantidad,
-          precioUnitario: item.precioUnitario || producto?.precio
-        };
-      });
+      const items = form.items.map(item => ({
+        productoId: item.productoId,
+        cantidad: item.cantidad
+        // precioUnitario se omite - el backend usa automáticamente el precio del producto
+      }));
 
       await apolloClient.mutate({
         mutation: CREAR_PEDIDO_MUTATION,
@@ -235,7 +231,7 @@ export default function OrdersPage() {
             clienteId: form.clienteId,
             direccionEntrega: form.direccionEntrega,
             observaciones: form.observaciones || null,
-            items: itemsInput
+            items: items
           }
         }
       });
@@ -410,47 +406,55 @@ export default function OrdersPage() {
                 </button>
               </div>
               
-              {form.items.map((item, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 p-2 border rounded">
-                  <select
-                    value={item.productoId}
-                    onChange={(e) => updateItem(index, "productoId", e.target.value)}
-                    className="px-2 py-1 border rounded text-sm"
-                    required
-                  >
-                    <option value="">Seleccionar producto</option>
-                    {productos.map((producto) => (
-                      <option key={producto.id} value={producto.id}>
-                        {producto.nombre} - ${producto.precio}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Cantidad"
-                    min="1"
-                    value={item.cantidad}
-                    onChange={(e) => updateItem(index, "cantidad", parseInt(e.target.value) || 1)}
-                    className="px-2 py-1 border rounded text-sm"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Precio unitario (opcional)"
-                    step="0.01"
-                    value={item.precioUnitario || ""}
-                    onChange={(e) => updateItem(index, "precioUnitario", parseFloat(e.target.value) || 0)}
-                    className="px-2 py-1 border rounded text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              ))}
+              {form.items.map((item, index) => {
+                const selectedProduct = productos.find(p => p.id === item.productoId);
+                const subtotal = selectedProduct ? selectedProduct.precio * item.cantidad : 0;
+                
+                return (
+                  <div key={index} className="flex gap-2 items-center p-3 border rounded-lg bg-gray-50">
+                    <div className="flex-1">
+                      <select
+                        value={item.productoId}
+                        onChange={(e) => updateItem(index, "productoId", e.target.value)}
+                        className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        <option value="">🔍 Seleccionar producto...</option>
+                        {productos.map((producto) => (
+                          <option key={producto.id} value={producto.id}>
+                            📦 {producto.nombre} - ${producto.precio}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedProduct && (
+                        <div className="text-xs text-gray-600 mt-1">
+                          💰 Precio unitario: ${selectedProduct.precio} | 📊 Subtotal: ${subtotal.toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="text-xs text-gray-600 mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        placeholder="1"
+                        min="1"
+                        value={item.cantidad}
+                        onChange={(e) => updateItem(index, "cantidad", parseInt(e.target.value) || 1)}
+                        className="w-20 px-2 py-1 border rounded text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      title="Eliminar item"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                );
+              })}
               
               {form.items.length > 0 && (
                 <div className="text-right font-medium">

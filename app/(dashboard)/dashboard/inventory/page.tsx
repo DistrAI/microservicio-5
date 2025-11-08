@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { apolloClient } from "@/lib/apollo-client";
 import { INVENTARIOS_QUERY, INVENTARIOS_STOCK_BAJO_QUERY, BUSCAR_INVENTARIOS_POR_NOMBRE_QUERY, MOVIMIENTOS_POR_PRODUCTO_QUERY } from "@/graphql/queries/inventario";
-import { AJUSTAR_INVENTARIO_MUTATION, DESACTIVAR_INVENTARIO_MUTATION } from "@/graphql/mutations/inventario";
+import { CREAR_INVENTARIO_MUTATION, AJUSTAR_INVENTARIO_MUTATION, DESACTIVAR_INVENTARIO_MUTATION } from "@/graphql/mutations/inventario";
+import { PRODUCTOS_QUERY } from "@/graphql/queries/productos";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -77,8 +78,16 @@ export default function InventoryPage() {
 
   // ADMIN form state
   const isAdmin = user?.rol === "ADMIN";
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [showAdjustForm, setShowAdjustForm] = useState(false);
   const [selectedInventario, setSelectedInventario] = useState<Inventario | null>(null);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [createForm, setCreateForm] = useState({
+    productoId: "",
+    cantidadInicial: 0,
+    ubicacion: "",
+    stockMinimo: 0
+  });
   const [adjustForm, setAdjustForm] = useState({
     productoId: "",
     cantidad: 0,
@@ -113,11 +122,11 @@ export default function InventoryPage() {
       });
 
       if (search.trim().length > 0) {
-        setData(data.buscarInventariosPorNombre);
+        setData((data as any).buscarInventariosPorNombre);
       } else if (filter === "low-stock") {
-        setData(data.inventariosStockBajo);
+        setData((data as any).inventariosStockBajo);
       } else {
-        setData(data.inventarios);
+        setData((data as any).inventarios);
       }
     } catch (err: any) {
       console.error("Error fetching inventory:", err);
@@ -135,6 +144,21 @@ export default function InventoryPage() {
     }
   };
 
+  const fetchProductos = async () => {
+    try {
+      const { data } = await apolloClient.query({
+        query: PRODUCTOS_QUERY,
+        variables: { page: 0, size: 100 },
+        fetchPolicy: "network-only"
+      });
+      // Solo productos activos que no tengan inventario
+      const productosActivos = (data as any).productos.content.filter((p: any) => p.activo);
+      setProductos(productosActivos);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
   const fetchMovimientos = async (productoId: string) => {
     setMovimientosLoading(true);
     try {
@@ -143,7 +167,7 @@ export default function InventoryPage() {
         variables: { productoId, page: 0, size: 20 },
         fetchPolicy: "network-only"
       });
-      setMovimientos(data.movimientosPorProducto);
+      setMovimientos((data as any).movimientosPorProducto);
     } catch (err) {
       console.error("Error fetching movements:", err);
       toast.error("Error al cargar los movimientos");
@@ -159,6 +183,9 @@ export default function InventoryPage() {
       return;
     }
     fetchPage(0);
+    if (isAdmin) {
+      fetchProductos();
+    }
   }, [isAuthenticated, checkAuth, router, search, filter]);
 
   useEffect(() => {
@@ -181,6 +208,44 @@ export default function InventoryPage() {
   const handleFilterChange = (newFilter: "all" | "low-stock") => {
     setFilter(newFilter);
     setPage(0);
+  };
+
+  const handleCreateInventory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAdmin) return;
+
+    try {
+      await apolloClient.mutate({
+        mutation: CREAR_INVENTARIO_MUTATION,
+        variables: {
+          input: {
+            productoId: createForm.productoId,
+            cantidadInicial: createForm.cantidadInicial,
+            ubicacion: createForm.ubicacion,
+            stockMinimo: createForm.stockMinimo
+          }
+        }
+      });
+
+      toast.success("Inventario creado exitosamente");
+      setCreateForm({
+        productoId: "",
+        cantidadInicial: 0,
+        ubicacion: "",
+        stockMinimo: 0
+      });
+      setShowCreateForm(false);
+      fetchPage(page);
+      fetchProductos(); // Refresh products list
+    } catch (err: any) {
+      console.error("Error creating inventory:", err);
+      if (err.graphQLErrors?.[0]?.extensions?.code === "BAD_REQUEST") {
+        const errors = err.graphQLErrors[0].extensions.errors;
+        toast.error(`Error de validación: ${errors?.join(", ") || "Datos inválidos"}`);
+      } else {
+        toast.error("Error al crear el inventario");
+      }
+    }
   };
 
   const startAdjust = (inventario: Inventario) => {
@@ -344,6 +409,185 @@ export default function InventoryPage() {
           </button>
         </div>
       </div>
+
+      {/* ADMIN Create Button */}
+      {isAdmin && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            {showCreateForm ? "Cancelar" : "Crear Inventario"}
+          </button>
+        </div>
+      )}
+
+      {/* ADMIN Create Form */}
+      {isAdmin && showCreateForm && (
+        <div className="mb-8 p-6 border-2 border-green-200 rounded-lg bg-gradient-to-r from-green-50 to-blue-50 shadow-lg">
+          <div className="flex items-center mb-6">
+            <div className="bg-green-600 text-white p-2 rounded-full mr-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-800">Crear Nuevo Inventario</h2>
+          </div>
+          
+          <form onSubmit={handleCreateInventory} className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Selector de Producto */}
+              <div className="space-y-2">
+                <label className="flex items-center text-sm font-semibold text-gray-700">
+                  <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  Producto a inventariar
+                </label>
+                <select
+                  value={createForm.productoId}
+                  onChange={(e) => setCreateForm({ ...createForm, productoId: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm"
+                  required
+                >
+                  <option value="">🔍 Seleccionar producto...</option>
+                  {productos.map((producto) => (
+                    <option key={producto.id} value={producto.id}>
+                      📦 {producto.nombre} - {producto.sku} (${producto.precio})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Cantidad Inicial */}
+              <div className="space-y-2">
+                <label className="flex items-center text-sm font-semibold text-gray-700">
+                  <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                  </svg>
+                  Cantidad inicial en stock
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Ej: 50"
+                    min="0"
+                    value={createForm.cantidadInicial}
+                    onChange={(e) => setCreateForm({ ...createForm, cantidadInicial: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-3 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-sm"
+                    required
+                  />
+                  <span className="absolute left-3 top-3 text-gray-500">📊</span>
+                  <span className="absolute right-3 top-3 text-sm text-gray-500">unidades</span>
+                </div>
+                <p className="text-xs text-gray-600">💡 Cantidad de productos que tienes disponible ahora</p>
+              </div>
+
+              {/* Ubicación */}
+              <div className="space-y-2">
+                <label className="flex items-center text-sm font-semibold text-gray-700">
+                  <svg className="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Ubicación física
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Ej: Almacén A, Estante 2, Nivel 3"
+                    value={createForm.ubicacion}
+                    onChange={(e) => setCreateForm({ ...createForm, ubicacion: e.target.value })}
+                    className="w-full px-4 py-3 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-sm"
+                    required
+                  />
+                  <span className="absolute left-3 top-3 text-gray-500">🏪</span>
+                </div>
+                <p className="text-xs text-gray-600">💡 Dónde están físicamente almacenados los productos</p>
+              </div>
+
+              {/* Stock Mínimo */}
+              <div className="space-y-2">
+                <label className="flex items-center text-sm font-semibold text-gray-700">
+                  <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  Stock mínimo (alerta)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Ej: 10"
+                    min="0"
+                    value={createForm.stockMinimo}
+                    onChange={(e) => setCreateForm({ ...createForm, stockMinimo: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-3 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-sm"
+                    required
+                  />
+                  <span className="absolute left-3 top-3 text-gray-500">⚠️</span>
+                  <span className="absolute right-3 top-3 text-sm text-gray-500">unidades</span>
+                </div>
+                <p className="text-xs text-gray-600">💡 Cuando queden estas unidades o menos, te avisaremos para reabastecer</p>
+              </div>
+            </div>
+
+            {/* Validación visual */}
+            {createForm.cantidadInicial > 0 && createForm.stockMinimo > 0 && (
+              <div className={`p-4 rounded-lg border-2 ${
+                createForm.cantidadInicial <= createForm.stockMinimo 
+                  ? 'bg-yellow-50 border-yellow-300' 
+                  : 'bg-green-50 border-green-300'
+              }`}>
+                {createForm.cantidadInicial <= createForm.stockMinimo ? (
+                  <div className="flex items-center text-yellow-800">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                    <span className="font-medium">⚠️ Advertencia: Este inventario aparecerá inmediatamente como "Stock Bajo" porque la cantidad inicial ({createForm.cantidadInicial}) es menor o igual al stock mínimo ({createForm.stockMinimo})</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center text-green-800">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="font-medium">✅ Perfecto: Tendrás {createForm.cantidadInicial - createForm.stockMinimo} unidades de margen antes de la alerta</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                <span className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Crear Inventario
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setCreateForm({
+                    productoId: "",
+                    cantidadInicial: 0,
+                    ubicacion: "",
+                    stockMinimo: 0
+                  });
+                }}
+                className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg transition-all duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* ADMIN Adjust Form Modal */}
       {isAdmin && showAdjustForm && selectedInventario && (

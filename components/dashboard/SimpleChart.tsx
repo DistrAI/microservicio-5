@@ -14,11 +14,25 @@ interface SimpleChartProps {
 }
 
 export default function SimpleChart({ title, data, type, height = 300 }: SimpleChartProps) {
-  const maxValue = Math.max(...data.values);
+  // Filter out invalid values and ensure we have valid data
+  const validValues = data.values.filter(v => !isNaN(v) && isFinite(v) && v >= 0);
+  const maxValue = validValues.length > 0 ? Math.max(...validValues) : 1;
   const colors = data.colors || [
     "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", 
     "#06B6D4", "#84CC16", "#F97316", "#EC4899", "#6366F1"
   ];
+
+  // If no valid data, show empty state
+  if (validValues.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-lg border">
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        <div className="flex items-center justify-center" style={{ height }}>
+          <p className="text-gray-500">No hay datos disponibles</p>
+        </div>
+      </div>
+    );
+  }
 
   if (type === "bar") {
     return (
@@ -26,8 +40,9 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
         <h3 className="text-lg font-semibold mb-4">{title}</h3>
         <div className="space-y-3" style={{ height }}>
           {data.labels.map((label, index) => {
-            const value = data.values[index];
-            const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+            const value = data.values[index] || 0;
+            const safeValue = isNaN(value) ? 0 : value;
+            const percentage = maxValue > 0 ? (safeValue / maxValue) * 100 : 0;
             return (
               <div key={index} className="flex items-center">
                 <div className="w-24 text-sm text-gray-600 truncate">{label}</div>
@@ -41,12 +56,12 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
                       }}
                     >
                       <span className="text-xs text-white font-medium">
-                        {value > 0 ? value : ''}
+                        {safeValue > 0 ? safeValue : ''}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="w-12 text-sm text-gray-900 text-right">{value}</div>
+                <div className="w-12 text-sm text-gray-900 text-right">{safeValue}</div>
               </div>
             );
           })}
@@ -56,7 +71,8 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
   }
 
   if (type === "pie" || type === "doughnut") {
-    const total = data.values.reduce((sum, value) => sum + value, 0);
+    const safeValues = data.values.map(v => isNaN(v) || v < 0 ? 0 : v);
+    const total = safeValues.reduce((sum, value) => sum + value, 0);
     let cumulativePercentage = 0;
 
     return (
@@ -73,7 +89,7 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
                 stroke="#E5E7EB"
                 strokeWidth="20"
               />
-              {data.values.map((value, index) => {
+              {safeValues.map((value, index) => {
                 const percentage = total > 0 ? (value / total) * 100 : 0;
                 const strokeDasharray = `${percentage * 5.02} 502`;
                 const strokeDashoffset = -cumulativePercentage * 5.02;
@@ -113,7 +129,7 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
                 />
                 <span className="text-sm text-gray-600">{label}</span>
                 <span className="ml-2 text-sm font-medium text-gray-900">
-                  {data.values[index]}
+                  {safeValues[index]}
                 </span>
               </div>
             ))}
@@ -127,6 +143,10 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
     const svgHeight = height - 60;
     const svgWidth = 400;
     const padding = 40;
+    
+    // Handle edge cases
+    const safeMaxValue = maxValue > 0 ? maxValue : 1;
+    const safeValues = data.values.map(v => isNaN(v) || v < 0 ? 0 : v);
     
     return (
       <div className="bg-white p-6 rounded-lg border">
@@ -147,25 +167,31 @@ export default function SimpleChart({ title, data, type, height = 300 }: SimpleC
             ))}
             
             {/* Line chart */}
-            <polyline
-              points={data.values
-                .map((value, index) => {
-                  const x = padding + (index * (svgWidth - 2 * padding)) / (data.values.length - 1);
-                  const y = svgHeight - padding - ((value / maxValue) * (svgHeight - 2 * padding));
-                  return `${x},${y}`;
-                })
-                .join(' ')}
-              fill="none"
-              stroke={colors[0]}
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            {safeValues.length > 1 && (
+              <polyline
+                points={safeValues
+                  .map((value, index) => {
+                    const x = padding + (index * (svgWidth - 2 * padding)) / Math.max(safeValues.length - 1, 1);
+                    const y = svgHeight - padding - ((value / safeMaxValue) * (svgHeight - 2 * padding));
+                    return `${x},${y}`;
+                  })
+                  .join(' ')}
+                fill="none"
+                stroke={colors[0]}
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
             
             {/* Data points */}
-            {data.values.map((value, index) => {
-              const x = padding + (index * (svgWidth - 2 * padding)) / (data.values.length - 1);
-              const y = svgHeight - padding - ((value / maxValue) * (svgHeight - 2 * padding));
+            {safeValues.map((value, index) => {
+              const x = padding + (index * (svgWidth - 2 * padding)) / Math.max(safeValues.length - 1, 1);
+              const y = svgHeight - padding - ((value / safeMaxValue) * (svgHeight - 2 * padding));
+              
+              // Ensure coordinates are valid numbers
+              if (isNaN(x) || isNaN(y)) return null;
+              
               return (
                 <circle
                   key={index}
