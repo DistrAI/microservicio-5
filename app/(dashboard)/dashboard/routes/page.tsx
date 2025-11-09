@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
+const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+
 interface Usuario {
   id: string;
   nombreCompleto: string;
@@ -55,10 +57,10 @@ interface RutaEntregaPage {
 }
 
 const ESTADOS_RUTA = [
-  { value: "PLANIFICADA", label: "Planificada", color: "bg-blue-100 text-blue-800" },
-  { value: "EN_CURSO", label: "En Curso", color: "bg-yellow-100 text-yellow-800" },
-  { value: "COMPLETADA", label: "Completada", color: "bg-green-100 text-green-800" },
-  { value: "CANCELADA", label: "Cancelada", color: "bg-red-100 text-red-800" }
+  { value: "PLANIFICADA", label: "Planificada", color: "bg-gray-100 text-gray-600" },
+  { value: "EN_CURSO", label: "En Curso", color: "bg-gray-100 text-gray-600" },
+  { value: "COMPLETADA", label: "Completada", color: "bg-gray-100 text-gray-600" },
+  { value: "CANCELADA", label: "Cancelada", color: "bg-gray-100 text-gray-600" }
 ];
 
 export default function RoutesPage() {
@@ -505,10 +507,10 @@ export default function RoutesPage() {
 
       {/* Assign Pedidos Modal */}
       {isAdmin && showAssignForm && selectedRuta && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="assign-pedidos-title">
           <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">
+              <h2 id="assign-pedidos-title" className="text-lg font-medium">
                 Asignar Pedidos a Ruta #{selectedRuta.id}
               </h2>
               <button
@@ -535,7 +537,7 @@ export default function RoutesPage() {
                       />
                       <div className="text-sm">
                         <div className="font-medium">#{pedido.id} - {pedido.cliente.nombre}</div>
-                        <div className="text-gray-600">${pedido.total} - {pedido.direccionEntrega}</div>
+                        <div className="text-gray-600">{formatCurrency(pedido.total)} - {pedido.direccionEntrega}</div>
                       </div>
                     </label>
                   ))}
@@ -605,7 +607,7 @@ export default function RoutesPage() {
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="text-sm">
                           <div className="font-medium">{ruta.pedidos.length} pedidos</div>
-                          <div className="text-gray-600">${totalPedidos.toFixed(2)}</div>
+                          <div className="text-gray-600">{formatCurrency(totalPedidos)}</div>
                           {ruta.pedidos.map((pedido, idx) => (
                             <div key={idx} className="text-xs">
                               #{pedido.id} - {pedido.cliente.nombre}

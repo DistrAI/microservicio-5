@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
+const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+
 interface Producto {
   id: string;
   nombre: string;
@@ -63,11 +65,11 @@ interface ItemForm {
 }
 
 const ESTADOS_PEDIDO = [
-  { value: "PENDIENTE", label: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
-  { value: "EN_PROCESO", label: "En Proceso", color: "bg-blue-100 text-blue-800" },
-  { value: "EN_CAMINO", label: "En Camino", color: "bg-purple-100 text-purple-800" },
-  { value: "ENTREGADO", label: "Entregado", color: "bg-green-100 text-green-800" },
-  { value: "CANCELADO", label: "Cancelado", color: "bg-red-100 text-red-800" }
+  { value: "PENDIENTE", label: "Pendiente", color: "bg-gray-100 text-gray-800" },
+  { value: "EN_PROCESO", label: "En Proceso", color: "bg-gray-100 text-gray-800" },
+  { value: "EN_CAMINO", label: "En Camino", color: "bg-gray-100 text-gray-800" },
+  { value: "ENTREGADO", label: "Entregado", color: "bg-gray-100 text-gray-800" },
+  { value: "CANCELADO", label: "Cancelado", color: "bg-gray-100 text-gray-800" }
 ];
 
 export default function OrdersPage() {
@@ -432,13 +434,13 @@ export default function OrdersPage() {
                         <option value="">Seleccionar producto...</option>
                         {productos.map((producto) => (
                           <option key={producto.id} value={producto.id}>
-                            {producto.nombre} - ${producto.precio}
+                            {producto.nombre} - {formatCurrency(producto.precio)}
                           </option>
                         ))}
                       </select>
                       {selectedProduct && (
                         <div className="text-xs text-gray-600 mt-1">
-                          Precio unitario: ${selectedProduct.precio} · Subtotal: ${subtotal.toFixed(2)}
+                          Precio unitario: {formatCurrency(selectedProduct.precio)} · Subtotal: {formatCurrency(subtotal)}
                         </div>
                       )}
                     </div>
@@ -468,7 +470,7 @@ export default function OrdersPage() {
               
               {form.items.length > 0 && (
                 <div className="text-right font-medium">
-                  Total estimado: ${calculateTotal().toFixed(2)}
+                  Total estimado: {formatCurrency(calculateTotal())}
                 </div>
               )}
             </div>
@@ -521,7 +523,7 @@ export default function OrdersPage() {
                         </span>
                       </td>
                       <td className="border border-gray-300 px-4 py-2 font-medium">
-                        ${pedido.total.toFixed(2)}
+                        {formatCurrency(pedido.total)}
                       </td>
                       <td className="border border-gray-300 px-4 py-2">{pedido.direccionEntrega}</td>
                       <td className="border border-gray-300 px-4 py-2">

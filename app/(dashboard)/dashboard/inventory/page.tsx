@@ -57,9 +57,9 @@ interface MovimientoPage {
 }
 
 const TIPOS_MOVIMIENTO = [
-  { value: "ENTRADA", label: "Entrada", color: "bg-green-100 text-green-800" },
-  { value: "SALIDA", label: "Salida", color: "bg-red-100 text-red-800" },
-  { value: "AJUSTE", label: "Ajuste", color: "bg-blue-100 text-blue-800" }
+  { value: "ENTRADA", label: "Entrada", color: "bg-gray-100 text-gray-800" },
+  { value: "SALIDA", label: "Salida", color: "bg-gray-100 text-gray-800" },
+  { value: "AJUSTE", label: "Ajuste", color: "bg-gray-100 text-gray-800" }
 ];
 
 export default function InventoryPage() {
@@ -523,9 +523,9 @@ export default function InventoryPage() {
 
       {/* ADMIN Adjust Form Modal */}
       {isAdmin && showAdjustForm && selectedInventario && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="ajustar-inventario-title">
           <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-lg font-medium mb-4">
+            <h2 id="ajustar-inventario-title" className="text-lg font-medium mb-4">
               Ajustar Inventario: {selectedInventario.producto.nombre}
             </h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -598,10 +598,10 @@ export default function InventoryPage() {
 
       {/* Movimientos Modal */}
       {showMovimientos && selectedInventario && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="movimientos-title">
           <div className="bg-white p-6 rounded-lg max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">
+              <h2 id="movimientos-title" className="text-lg font-medium">
                 Movimientos: {selectedInventario.producto.nombre}
               </h2>
               <button

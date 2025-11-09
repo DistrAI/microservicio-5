@@ -1,0 +1,15 @@
+schema: http://localhost:8080/graphql
+documents:
+  - "app/**/*.{ts,tsx}"
+  - "graphql/**/*.{ts,tsx}"
+ignoreNoDocuments: true
+generates:
+  graphql/__generated__/types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node
+config:
+  skipTypename: false
+  enumsAsTypes: true
+  maybeValue: T | null
