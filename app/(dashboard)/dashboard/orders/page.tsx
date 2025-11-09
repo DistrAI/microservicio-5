@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
@@ -315,12 +318,12 @@ export default function OrdersPage() {
           >
             Volver
           </button>
-          <button
+          <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="px-4 py-2 border hover:bg-gray-50"
           >
             Cerrar sesión
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -350,12 +353,9 @@ export default function OrdersPage() {
       {/* ADMIN Create Button */}
       {isAdmin && (
         <div className="mb-6">
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-          >
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-black text-white hover:bg-gray-900">
             {showCreateForm ? "Cancelar" : "Crear Pedido"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -366,7 +366,7 @@ export default function OrdersPage() {
           <form onSubmit={handleCreateOrder} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Cliente</label>
+                <Label className="text-sm font-medium text-gray-900">Cliente</Label>
                 <select
                   value={form.clienteId}
                   onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
@@ -382,19 +382,19 @@ export default function OrdersPage() {
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Dirección de entrega</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Dirección de entrega</Label>
+                <Input
                   type="text"
                   placeholder="Ej: Av. Siempre Viva 123"
                   value={form.direccionEntrega}
                   onChange={(e) => setForm({ ...form, direccionEntrega: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Observaciones (opcional)</label>
+              <Label className="text-sm font-medium text-gray-900">Observaciones (opcional)</Label>
               <textarea
                 placeholder="Notas para el repartidor o consideraciones"
                 value={form.observaciones}
@@ -408,13 +408,9 @@ export default function OrdersPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-gray-900">Items del Pedido</h3>
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="px-3 py-1 text-sm bg-black text-white rounded hover:bg-gray-900"
-                >
+                <Button type="button" onClick={addItem} className="px-3 py-1 text-sm bg-black text-white hover:bg-gray-900">
                   Agregar item
-                </button>
+                </Button>
               </div>
               
               {form.items.map((item, index) => {
@@ -424,7 +420,7 @@ export default function OrdersPage() {
                 return (
                   <div key={index} className="flex gap-3 items-start p-3 border border-gray-200 rounded-md bg-white">
                     <div className="flex-1 space-y-1">
-                      <label className="text-xs text-gray-700">Producto</label>
+                      <Label className="text-xs text-gray-700">Producto</Label>
                       <select
                         value={item.productoId}
                         onChange={(e) => updateItem(index, "productoId", e.target.value)}
@@ -445,25 +441,25 @@ export default function OrdersPage() {
                       )}
                     </div>
                     <div className="flex flex-col items-start">
-                      <label className="text-xs text-gray-700 mb-1">Cantidad</label>
-                      <input
+                      <Label className="text-xs text-gray-700 mb-1">Cantidad</Label>
+                      <Input
                         type="number"
                         placeholder="1"
                         min="1"
                         value={item.cantidad}
                         onChange={(e) => updateItem(index, "cantidad", parseInt(e.target.value) || 1)}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                        className="w-24 text-sm"
                         required
                       />
                     </div>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => removeItem(index)}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none"
+                      className="px-3 py-2 text-sm border hover:bg-gray-100"
                       title="Eliminar item"
                     >
                       Eliminar
-                    </button>
+                    </Button>
                   </div>
                 );
               })}
@@ -475,12 +471,9 @@ export default function OrdersPage() {
               )}
             </div>
 
-            <button
-              type="submit"
-              className="px-5 py-2 bg-black text-white rounded hover:bg-gray-900"
-            >
+            <Button type="submit" className="px-5 py-2 bg-black text-white hover:bg-gray-900">
               Crear Pedido
-            </button>
+            </Button>
           </form>
         </div>
       )}
@@ -555,12 +548,12 @@ export default function OrdersPage() {
                               </select>
                             )}
                             {isAdmin && pedido.estado !== "CANCELADO" && pedido.estado !== "ENTREGADO" && (
-                              <button
+                              <Button
                                 onClick={() => handleCancelOrder(pedido.id)}
-                                className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                                className="px-2 py-1 text-xs border hover:bg-gray-100"
                               >
                                 Cancelar
-                              </button>
+                              </Button>
                             )}
                           </div>
                         </td>

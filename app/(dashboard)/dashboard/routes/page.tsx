@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
@@ -357,12 +360,12 @@ export default function RoutesPage() {
           >
             Volver
           </button>
-          <button
+          <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="px-4 py-2 border hover:bg-gray-50"
           >
             Cerrar sesión
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -412,12 +415,9 @@ export default function RoutesPage() {
       {/* ADMIN Create Button */}
       {isAdmin && (
         <div className="mb-6">
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-          >
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-black text-white hover:bg-gray-900">
             {showCreateForm ? "Cancelar" : "Crear Ruta"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -428,7 +428,7 @@ export default function RoutesPage() {
           <form onSubmit={handleCreateRoute} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Repartidor</label>
+                <Label className="text-sm font-medium text-gray-900">Repartidor</Label>
                 <select
                   value={form.repartidorId}
                   onChange={(e) => setForm({ ...form, repartidorId: e.target.value })}
@@ -444,32 +444,32 @@ export default function RoutesPage() {
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Fecha de ruta</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Fecha de ruta</Label>
+                <Input
                   type="date"
                   value={form.fechaRuta}
                   onChange={(e) => setForm({ ...form, fechaRuta: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Distancia total (km) - opcional</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Distancia total (km) - opcional</Label>
+                <Input
                   type="number"
                   step="0.1"
                   value={form.distanciaTotalKm || ""}
                   onChange={(e) => setForm({ ...form, distanciaTotalKm: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Tiempo estimado (min) - opcional</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Tiempo estimado (min) - opcional</Label>
+                <Input
                   type="number"
                   value={form.tiempoEstimadoMin || ""}
                   onChange={(e) => setForm({ ...form, tiempoEstimadoMin: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -495,12 +495,9 @@ export default function RoutesPage() {
               </div>
             )}
 
-            <button
-              type="submit"
-              className="px-5 py-2 bg-black text-white rounded hover:bg-gray-900"
-            >
+            <Button type="submit" className="px-5 py-2 bg-black text-white hover:bg-gray-900">
               Crear Ruta
-            </button>
+            </Button>
           </form>
         </div>
       )}
@@ -612,13 +609,13 @@ export default function RoutesPage() {
                             <div key={idx} className="text-xs">
                               #{pedido.id} - {pedido.cliente.nombre}
                               {isAdmin && ruta.estado === "PLANIFICADA" && (
-                                <button
+                                <Button
                                   onClick={() => handleRemovePedido(ruta.id, pedido.id)}
-                                  className="ml-1 text-red-600 hover:text-red-800"
+                                  className="ml-1 px-1 text-xs border hover:bg-gray-100"
                                   title="Remover pedido"
                                 >
                                   ×
-                                </button>
+                                </Button>
                               )}
                             </div>
                           ))}
@@ -646,20 +643,20 @@ export default function RoutesPage() {
                           {isAdmin && (
                             <>
                               {ruta.estado === "PLANIFICADA" && (
-                                <button
+                                <Button
                                   onClick={() => startAssignPedidos(ruta)}
-                                  className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                  className="px-2 py-1 text-xs border hover:bg-gray-100"
                                 >
                                   Asignar Pedidos
-                                </button>
+                                </Button>
                               )}
                               {ruta.activo && ruta.estado !== "COMPLETADA" && (
-                                <button
+                                <Button
                                   onClick={() => handleDesactivarRuta(ruta.id)}
-                                  className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                                  className="px-2 py-1 text-xs border hover:bg-gray-100"
                                 >
                                   Desactivar
-                                </button>
+                                </Button>
                               )}
                             </>
                           )}

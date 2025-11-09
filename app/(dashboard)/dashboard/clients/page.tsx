@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface Cliente {
   id: string;
@@ -220,38 +223,27 @@ export default function ClientsPage() {
           >
             Volver
           </button>
-          <button
+          <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="px-4 py-2 border hover:bg-gray-50"
           >
             Cerrar sesión
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="mb-6 flex gap-2">
-        <input
+        <Input
           type="text"
           placeholder="Buscar por nombre..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+          className="flex-1"
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-        >
-          Buscar
-        </button>
+        <Button type="submit" className="bg-black text-white hover:bg-gray-900">Buscar</Button>
         {search && (
-          <button
-            type="button"
-            onClick={clearSearch}
-            className="px-4 py-2 border rounded hover:bg-gray-50"
-          >
-            Limpiar
-          </button>
+          <Button type="button" onClick={clearSearch} className="border hover:bg-gray-50">Limpiar</Button>
         )}
       </form>
 
@@ -263,64 +255,57 @@ export default function ClientsPage() {
           </h2>
           <form onSubmit={editingId ? handleUpdate : handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Nombre completo</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Nombre completo</Label>
+              <Input
                 type="text"
                 placeholder="Nombre completo"
                 value={form.nombre}
                 onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                className="w-full"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Email</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Email</Label>
+              <Input
                 type="email"
                 placeholder="correo@dominio.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                className="w-full"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Teléfono</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Teléfono</Label>
+              <Input
                 type="tel"
                 placeholder="Ej: +56 9 1234 5678"
                 value={form.telefono}
                 onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                className="w-full"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Dirección</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Dirección</Label>
+              <Input
                 type="text"
                 placeholder="Calle, número, ciudad"
                 value={form.direccion}
                 onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                className="w-full"
                 required
               />
             </div>
             <div className="md:col-span-2 flex gap-2 pt-2">
-              <button
-                type="submit"
-                className="px-5 py-2 bg-black text-white rounded-md hover:bg-gray-900"
-              >
+              <Button type="submit" className="px-5 py-2 bg-black text-white hover:bg-gray-900">
                 {editingId ? "Actualizar" : "Crear"}
-              </button>
+              </Button>
               {editingId && (
-                <button
-                  type="button"
-                  onClick={cancelEdit}
-                  className="px-5 py-2 border border-gray-400 text-gray-900 rounded-md hover:bg-gray-100"
-                >
+                <Button type="button" onClick={cancelEdit} className="px-5 py-2 border hover:bg-gray-100">
                   Cancelar
-                </button>
+                </Button>
               )}
             </div>
           </form>
@@ -354,9 +339,7 @@ export default function ClientsPage() {
                     <td className="border border-gray-300 px-4 py-2">{cliente.telefono}</td>
                     <td className="border border-gray-300 px-4 py-2">{cliente.direccion}</td>
                     <td className="border border-gray-300 px-4 py-2">
-                      <span className={`px-2 py-1 rounded text-sm ${
-                        cliente.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className="px-2 py-1 rounded text-sm bg-gray-100 text-gray-800">
                         {cliente.activo ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
@@ -366,22 +349,10 @@ export default function ClientsPage() {
                     {isAdmin && (
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => startEdit(cliente)}
-                            className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => handleToggleActive(cliente)}
-                            className={`px-2 py-1 text-sm rounded ${
-                              cliente.activo 
-                                ? 'bg-red-600 text-white hover:bg-red-700' 
-                                : 'bg-green-600 text-white hover:bg-green-700'
-                            }`}
-                          >
+                          <Button onClick={() => startEdit(cliente)} className="px-2 py-1 text-sm border hover:bg-gray-100">Editar</Button>
+                          <Button onClick={() => handleToggleActive(cliente)} className="px-2 py-1 text-sm border hover:bg-gray-100">
                             {cliente.activo ? 'Desactivar' : 'Activar'}
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     )}

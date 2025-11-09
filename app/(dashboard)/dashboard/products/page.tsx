@@ -8,6 +8,9 @@ import { CREAR_PRODUCTO_MUTATION, ACTUALIZAR_PRODUCTO_MUTATION, DESACTIVAR_PRODU
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface Producto {
   id: string;
@@ -143,11 +146,11 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold">Productos</h1>
         <div className="flex items-center gap-2">
-          <input
+          <Input
             value={search}
             onChange={(e) => { setPage(0); setSearch(e.target.value); }}
             placeholder="Buscar por nombre"
-            className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+            className="text-sm"
           />
           <div className="text-sm text-gray-500">Página {data ? data.page + 1 : page + 1} de {data?.totalPages ?? 1}</div>
         </div>
@@ -158,25 +161,25 @@ export default function ProductsPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-3">{editingId ? "Editar producto" : "Crear producto"}</h2>
           <div className="grid md:grid-cols-4 gap-3">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Nombre</label>
-              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+              <Label className="text-sm font-medium text-gray-900">Nombre</Label>
+              <Input className="w-full" placeholder="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">SKU</label>
-              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+              <Label className="text-sm font-medium text-gray-900">SKU</Label>
+              <Input className="w-full" placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Precio</label>
-              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Precio" type="number" step="0.01" value={form.precio} onChange={(e) => setForm({ ...form, precio: e.target.value })} />
+              <Label className="text-sm font-medium text-gray-900">Precio</Label>
+              <Input className="w-full" placeholder="Precio" type="number" step="0.01" value={form.precio} onChange={(e) => setForm({ ...form, precio: e.target.value })} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-900">Descripción (opcional)</label>
-              <input className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black" placeholder="Descripción" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+              <Label className="text-sm font-medium text-gray-900">Descripción (opcional)</Label>
+              <Input className="w-full" placeholder="Descripción" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
             </div>
           </div>
           <div className="mt-3 flex gap-2">
-            <button className="px-5 py-2 bg-black text-white rounded-md hover:bg-gray-900 disabled:opacity-50" onClick={submitForm} disabled={loading || !form.nombre || !form.sku || !form.precio}>Guardar</button>
-            {editingId && <button className="px-5 py-2 border border-gray-400 text-gray-900 rounded-md hover:bg-gray-100" onClick={resetForm}>Cancelar</button>}
+            <Button className="px-5 py-2 bg-black text-white hover:bg-gray-900 disabled:opacity-50" onClick={submitForm} disabled={loading || !form.nombre || !form.sku || !form.precio}>Guardar</Button>
+            {editingId && <Button className="px-5 py-2 border hover:bg-gray-100" onClick={resetForm}>Cancelar</Button>}
           </div>
         </div>
       )}
@@ -207,16 +210,16 @@ export default function ProductsPage() {
                   <td className="p-2">{p.sku}</td>
                   <td className="p-2">${p.precio.toFixed(2)}</td>
                   <td className="p-2">
-                    <span className={p.activo ? "text-green-600" : "text-red-600"}>
-                      {p.activo ? "Sí" : "No"}
+                    <span className="px-2 py-1 rounded text-sm bg-gray-100 text-gray-800">
+                      {p.activo ? "Activo" : "Inactivo"}
                     </span>
                   </td>
                   {isAdmin && (
                     <td className="p-2 flex gap-2">
-                      <button className="px-2 py-1 border rounded" onClick={() => { setEditingId(p.id); setForm({ id: p.id, nombre: p.nombre, sku: p.sku, precio: String(p.precio), descripcion: "" }); }}>Editar</button>
-                      <button className="px-2 py-1 border rounded" onClick={() => toggleActivo(p)}>
+                      <Button className="px-2 py-1 border" onClick={() => { setEditingId(p.id); setForm({ id: p.id, nombre: p.nombre, sku: p.sku, precio: String(p.precio), descripcion: "" }); }}>Editar</Button>
+                      <Button className="px-2 py-1 border" onClick={() => toggleActivo(p)}>
                         {p.activo ? "Desactivar" : "Activar"}
-                      </button>
+                      </Button>
                     </td>
                   )}
                 </tr>

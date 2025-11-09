@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface Producto {
   id: string;
@@ -333,11 +336,11 @@ export default function InventoryPage() {
 
   const getStockStatus = (inventario: Inventario) => {
     if (inventario.cantidad === 0) {
-      return { label: "Sin Stock", color: "bg-red-100 text-red-800" };
+      return { label: "Sin Stock", color: "bg-gray-100 text-gray-800" };
     } else if (inventario.cantidad <= inventario.stockMinimo) {
-      return { label: "Stock Bajo", color: "bg-yellow-100 text-yellow-800" };
+      return { label: "Stock Bajo", color: "bg-gray-100 text-gray-800" };
     } else {
-      return { label: "Stock OK", color: "bg-green-100 text-green-800" };
+      return { label: "Stock OK", color: "bg-gray-100 text-gray-800" };
     }
   };
 
@@ -354,39 +357,32 @@ export default function InventoryPage() {
           >
             Volver
           </button>
-          <button
+          <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="px-4 py-2 border hover:bg-gray-50"
           >
             Cerrar sesión
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
         <form onSubmit={handleSearch} className="flex gap-2">
-          <input
+          <Input
             type="text"
             placeholder="Buscar por nombre de producto..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+            className="flex-1"
           />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-          >
+          <Button type="submit" className="bg-black text-white hover:bg-gray-900">
             Buscar
-          </button>
+          </Button>
           {search && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="px-4 py-2 border rounded hover:bg-gray-50"
-            >
+            <Button type="button" onClick={clearSearch} className="border hover:bg-gray-50">
               Limpiar
-            </button>
+            </Button>
           )}
         </form>
 
@@ -413,12 +409,9 @@ export default function InventoryPage() {
       {/* ADMIN Create Button */}
       {isAdmin && (
         <div className="mb-6">
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-          >
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-black text-white hover:bg-gray-900">
             {showCreateForm ? "Cancelar" : "Crear Inventario"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -431,7 +424,7 @@ export default function InventoryPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Selector de Producto */}
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Producto</label>
+                <Label className="text-sm font-medium text-gray-900">Producto</Label>
                 <select
                   value={createForm.productoId}
                   onChange={(e) => setCreateForm({ ...createForm, productoId: e.target.value })}
@@ -449,41 +442,41 @@ export default function InventoryPage() {
 
               {/* Cantidad Inicial */}
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Cantidad inicial</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Cantidad inicial</Label>
+                <Input
                   type="number"
                   placeholder="0"
                   min="0"
                   value={createForm.cantidadInicial}
                   onChange={(e) => setCreateForm({ ...createForm, cantidadInicial: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
 
               {/* Ubicación */}
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Ubicación</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Ubicación</Label>
+                <Input
                   type="text"
                   placeholder="Ej: Almacén A, Estante 2"
                   value={createForm.ubicacion}
                   onChange={(e) => setCreateForm({ ...createForm, ubicacion: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
 
               {/* Stock Mínimo */}
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-900">Stock mínimo (alerta)</label>
-                <input
+                <Label className="text-sm font-medium text-gray-900">Stock mínimo (alerta)</Label>
+                <Input
                   type="number"
                   placeholder="0"
                   min="0"
                   value={createForm.stockMinimo}
                   onChange={(e) => setCreateForm({ ...createForm, stockMinimo: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
@@ -495,13 +488,10 @@ export default function InventoryPage() {
             )}
 
             <div className="flex gap-3 pt-2">
-              <button
-                type="submit"
-                className="px-5 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
-              >
+              <Button type="submit" className="px-5 py-2 bg-black text-white hover:bg-gray-900">
                 Crear Inventario
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => {
                   setShowCreateForm(false);
@@ -512,10 +502,10 @@ export default function InventoryPage() {
                     stockMinimo: 0
                   });
                 }}
-                className="px-5 py-2 border border-gray-400 text-gray-900 rounded-md hover:bg-gray-100 focus:outline-none"
+                className="px-5 py-2 border"
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -533,63 +523,60 @@ export default function InventoryPage() {
             </p>
             <form onSubmit={handleAdjustInventory} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <Label className="block text-sm font-medium mb-1">
                   Cantidad (+ para agregar, - para quitar)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="number"
                   value={adjustForm.cantidad}
                   onChange={(e) => setAdjustForm({ ...adjustForm, cantidad: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Motivo</label>
-                <input
+                <Label className="block text-sm font-medium mb-1">Motivo</Label>
+                <Input
                   type="text"
                   placeholder="Motivo del ajuste (opcional)"
                   value={adjustForm.motivo}
                   onChange={(e) => setAdjustForm({ ...adjustForm, motivo: e.target.value })}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ubicación</label>
-                <input
+                <Label className="block text-sm font-medium mb-1">Ubicación</Label>
+                <Input
                   type="text"
                   value={adjustForm.ubicacion}
                   onChange={(e) => setAdjustForm({ ...adjustForm, ubicacion: e.target.value })}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Stock Mínimo</label>
-                <input
+                <Label className="block text-sm font-medium mb-1">Stock Mínimo</Label>
+                <Input
                   type="number"
                   min="0"
                   value={adjustForm.stockMinimo}
                   onChange={(e) => setAdjustForm({ ...adjustForm, stockMinimo: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                  className="w-full"
                 />
               </div>
               <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-                >
+                <Button type="submit" className="flex-1 bg-black text-white hover:bg-gray-900">
                   Ajustar
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => {
                     setShowAdjustForm(false);
                     setSelectedInventario(null);
                   }}
-                  className="flex-1 px-4 py-2 border rounded hover:bg-gray-50"
+                  className="flex-1 border hover:bg-gray-50"
                 >
                   Cancelar
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -711,27 +698,27 @@ export default function InventoryPage() {
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="flex flex-col gap-1">
-                          <button
+                          <Button
                             onClick={() => showMovimientosModal(inventario)}
-                            className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                            className="px-2 py-1 text-xs border hover:bg-gray-100"
                           >
                             Ver Movimientos
-                          </button>
+                          </Button>
                           {isAdmin && (
                             <>
-                              <button
+                              <Button
                                 onClick={() => startAdjust(inventario)}
-                                className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                                className="px-2 py-1 text-xs border hover:bg-gray-100"
                               >
                                 Ajustar Stock
-                              </button>
+                              </Button>
                               {inventario.activo && (
-                                <button
+                                <Button
                                   onClick={() => handleDesactivarInventario(inventario.producto.id)}
-                                  className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                                  className="px-2 py-1 text-xs border hover:bg-gray-100"
                                 >
                                   Desactivar
-                                </button>
+                                </Button>
                               )}
                             </>
                           )}
