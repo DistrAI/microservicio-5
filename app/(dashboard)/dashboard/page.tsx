@@ -179,6 +179,9 @@ export default function DashboardPage() {
           <Link href="/dashboard/orders" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Pedidos</Link>
           <Link href="/dashboard/inventory" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Inventario</Link>
           <Link href="/dashboard/routes" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Rutas</Link>
+          {user?.rol === "ADMIN" && (
+            <Link href="/dashboard/empresa/ubicacion" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Ubicación</Link>
+          )}
           <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
             className="px-4 py-2 border hover:bg-gray-50"
@@ -314,7 +317,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="mt-8 bg-white p-6 rounded-lg border">
         <h3 className="text-lg font-semibold mb-4">Acciones Rápidas</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className={`grid grid-cols-2 gap-4 ${user?.rol === "ADMIN" ? "md:grid-cols-5" : "md:grid-cols-4"}`}>
           <Link 
             href="/dashboard/orders" 
             className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
@@ -343,6 +346,15 @@ export default function DashboardPage() {
             <div className="text-2xl mb-2">👥</div>
             <div className="font-medium">Nuevo Cliente</div>
           </Link>
+          {user?.rol === "ADMIN" && (
+            <Link 
+              href="/dashboard/empresa/ubicacion" 
+              className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="text-2xl mb-2">📍</div>
+              <div className="font-medium">Ubicación Empresa</div>
+            </Link>
+          )}
         </div>
       </div>
     </div>
