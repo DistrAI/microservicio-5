@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { apolloClient } from "@/lib/apollo-client";
 import { 
@@ -54,7 +55,9 @@ interface PedidoRepartidor {
 }
 
 export default function RepartidorDashboard() {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const [stats, setStats] = useState<RepartidorStats | null>(null);
   const [pedidosHoy, setPedidosHoy] = useState<PedidoRepartidor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -204,6 +207,12 @@ export default function RepartidorDashboard() {
           >
             Actualizar
           </Button>
+          <Button
+            onClick={() => { logout(); router.replace("/sign-in"); }}
+            className="px-4 py-2 border hover:bg-gray-50"
+          >
+            Cerrar sesión
+          </Button>
         </div>
       </div>
 
@@ -214,48 +223,24 @@ export default function RepartidorDashboard() {
           value={stats?.pedidosEntregados || 0}
           subtitle="Total completados"
           trend={{ value: 8.2, isPositive: true }}
-          color="green"
-          icon={
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
         />
 
         <KPICard
           title="Pedidos Pendientes"
           value={stats?.pedidosPendientes || 0}
           subtitle="Por entregar"
-          color="yellow"
-          icon={
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
         />
 
         <KPICard
           title="Distancia Recorrida"
           value={`${stats?.distanciaRecorrida || 0} km`}
           subtitle="Total acumulado"
-          color="blue"
-          icon={
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          }
         />
 
         <KPICard
           title="Rutas Activas"
           value={stats?.rutasEnProceso || 0}
           subtitle="En proceso"
-          color="purple"
-          icon={
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
-          }
         />
       </div>
 
@@ -303,7 +288,7 @@ export default function RepartidorDashboard() {
                       {pedido.items.length} producto{pedido.items.length !== 1 ? 's' : ''} - ${pedido.total.toLocaleString()}
                     </p>
                     {pedido.cliente.telefono && (
-                      <p className="text-sm text-blue-600">📞 {pedido.cliente.telefono}</p>
+                      <p className="text-sm text-blue-600">Tel: {pedido.cliente.telefono}</p>
                     )}
                   </div>
                   <div className="text-right">
@@ -339,28 +324,24 @@ export default function RepartidorDashboard() {
             href="/dashboard/routes" 
             className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="text-2xl mb-2">🚚</div>
             <div className="font-medium">Mis Rutas</div>
           </Link>
           <Link 
             href="/dashboard/orders" 
             className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="text-2xl mb-2">📦</div>
             <div className="font-medium">Mis Pedidos</div>
           </Link>
           <button 
             onClick={fetchRepartidorData}
             className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="text-2xl mb-2">🔄</div>
             <div className="font-medium">Actualizar</div>
           </button>
           <Link 
             href="/dashboard/empresa/ubicacion" 
             className="p-4 text-center border rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="text-2xl mb-2">📍</div>
             <div className="font-medium">Ubicaciones</div>
           </Link>
         </div>

@@ -180,18 +180,27 @@ export default function DashboardPage() {
             {user?.rol === Rol.ADMIN ? "Panel de Control Administrativo" : "Panel del Repartidor"}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/products" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Productos</Link>
-          <Link href="/dashboard/clients" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Clientes</Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Enlaces comunes para todos los roles */}
           <Link href="/dashboard/orders" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Pedidos</Link>
-          <Link href="/dashboard/inventory" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Inventario</Link>
           <Link href="/dashboard/routes" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Rutas</Link>
+          
+          {/* Enlaces específicos para ADMIN */}
           {user?.rol === Rol.ADMIN && (
-            <Link href="/dashboard/empresa/ubicacion" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Ubicación</Link>
+            <>
+              <Link href="/dashboard/products" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Productos</Link>
+              <Link href="/dashboard/clients" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Clientes</Link>
+              <Link href="/dashboard/inventory" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Inventario</Link>
+              <Link href="/dashboard/empresa/ubicacion" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Ubicación</Link>
+              <Link href="/dashboard/asistente" className="px-4 py-2 rounded border bg-blue-600 text-white hover:bg-blue-700">Asistente IA</Link>
+            </>
           )}
+          
+          
+          {/* Botón de cerrar sesión para todos los roles */}
           <Button
             onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 border hover:bg-gray-50"
+            className="px-4 py-2 border hover:bg-gray-50 ml-auto"
           >
             Cerrar sesión
           </Button>
