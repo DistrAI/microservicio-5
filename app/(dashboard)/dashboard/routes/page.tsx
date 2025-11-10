@@ -14,6 +14,8 @@ import { es } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import RepartidorRoutesPage from "@/components/dashboard/RepartidorRoutesPage";
+import { Rol } from "@/types";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
@@ -81,7 +83,7 @@ export default function RoutesPage() {
   const [filterRepartidor, setFilterRepartidor] = useState<string>("");
 
   // ADMIN form state
-  const isAdmin = user?.rol === "ADMIN";
+  const isAdmin = user?.rol === Rol.ADMIN;
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [repartidores, setRepartidores] = useState<Usuario[]>([]);
   const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
@@ -348,6 +350,11 @@ export default function RoutesPage() {
   };
 
   if (!isAuthenticated) return null;
+
+  // Si es repartidor, mostrar vista específica
+  if (user?.rol === Rol.REPARTIDOR) {
+    return <RepartidorRoutesPage />;
+  }
 
   return (
     <div className="p-8">

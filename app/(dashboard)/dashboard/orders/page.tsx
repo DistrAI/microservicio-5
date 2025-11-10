@@ -14,6 +14,8 @@ import { es } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import RepartidorOrdersPage from "@/components/dashboard/RepartidorOrdersPage";
+import { Rol } from "@/types";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
@@ -89,7 +91,7 @@ export default function OrdersPage() {
   const [filterEstado, setFilterEstado] = useState<string>("");
 
   // ADMIN form state
-  const isAdmin = user?.rol === "ADMIN";
+  const isAdmin = user?.rol === Rol.ADMIN;
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -262,7 +264,7 @@ export default function OrdersPage() {
   };
 
   const handleUpdateEstado = async (pedidoId: string, nuevoEstado: string) => {
-    if (!isAdmin && user?.rol !== "REPARTIDOR") return;
+    if (!isAdmin && !(user && user.rol === Rol.REPARTIDOR)) return;
 
     try {
       await apolloClient.mutate({
@@ -306,6 +308,11 @@ export default function OrdersPage() {
   };
 
   if (!isAuthenticated) return null;
+
+  // Si es repartidor, mostrar vista específica
+  if (user?.rol === Rol.REPARTIDOR) {
+    return <RepartidorOrdersPage />;
+  }
 
   return (
     <div className="p-8">
@@ -495,7 +502,7 @@ export default function OrdersPage() {
                   <th className="border border-gray-300 px-4 py-2 text-left">Dirección</th>
                   <th className="border border-gray-300 px-4 py-2 text-left">Fecha Pedido</th>
                   <th className="border border-gray-300 px-4 py-2 text-left">Items</th>
-                  {(isAdmin || user?.rol === "REPARTIDOR") && <th className="border border-gray-300 px-4 py-2 text-left">Acciones</th>}
+                  {(isAdmin || (user && user.rol === Rol.REPARTIDOR)) && <th className="border border-gray-300 px-4 py-2 text-left">Acciones</th>}
                 </tr>
               </thead>
               <tbody>
@@ -531,7 +538,7 @@ export default function OrdersPage() {
                           ))}
                         </div>
                       </td>
-                      {(isAdmin || user?.rol === "REPARTIDOR") && (
+                      {(isAdmin || (user && user.rol === Rol.REPARTIDOR)) && (
                         <td className="border border-gray-300 px-4 py-2">
                           <div className="flex flex-col gap-1">
                             {pedido.estado !== "CANCELADO" && pedido.estado !== "ENTREGADO" && (
