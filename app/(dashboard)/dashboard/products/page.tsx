@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/ui/page-header";
 
 interface Producto {
   id: string;
@@ -143,8 +144,11 @@ export default function ProductsPage() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold">Productos</h1>
+      <PageHeader
+        title="Gestión de Productos"
+        description="Administra el catálogo de productos de tu empresa"
+        backUrl="/dashboard"
+      >
         <div className="flex items-center gap-2">
           <Input
             value={search}
@@ -154,7 +158,7 @@ export default function ProductsPage() {
           />
           <div className="text-sm text-gray-500">Página {data ? data.page + 1 : page + 1} de {data?.totalPages ?? 1}</div>
         </div>
-      </div>
+      </PageHeader>
 
       {isAdmin && (
         <div className="mb-6 p-6 border border-gray-200 rounded-lg bg-white">

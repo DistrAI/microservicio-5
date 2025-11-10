@@ -22,15 +22,7 @@ interface AIChatProps {
 }
 
 export function AIChat({ className }: AIChatProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: '¡Hola! Soy tu asistente de DistrIA. Puedo ayudarte con análisis de datos, reportes, optimización de rutas y mucho más. ¿En qué puedo asistirte hoy?',
-      role: 'assistant',
-      timestamp: new Date(),
-      type: 'text'
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -39,6 +31,20 @@ export function AIChat({ className }: AIChatProps) {
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Set initial assistant message on client after mount to avoid SSR hydration issues with Date
+  useEffect(() => {
+    setMessages([
+      {
+        id: '1',
+        content:
+          '¡Hola! Soy tu asistente de DistrIA. Puedo ayudarte con análisis de datos, reportes, optimización de rutas y mucho más. ¿En qué puedo asistirte hoy?',
+        role: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+      },
+    ]);
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -191,6 +191,7 @@ export default function DashboardPage() {
               <Link href="/dashboard/products" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Productos</Link>
               <Link href="/dashboard/clients" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Clientes</Link>
               <Link href="/dashboard/inventory" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Inventario</Link>
+              <Link href="/reports" className="px-4 py-2 rounded border bg-purple-600 text-white hover:bg-purple-700">📊 Reportes</Link>
               <Link href="/dashboard/empresa/ubicacion" className="px-4 py-2 rounded border bg-white hover:bg-gray-50">Ubicación</Link>
               <Link href="/dashboard/asistente" className="px-4 py-2 rounded border bg-blue-600 text-white hover:bg-blue-700">Asistente IA</Link>
             </>

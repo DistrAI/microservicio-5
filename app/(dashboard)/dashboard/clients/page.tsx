@@ -13,6 +13,7 @@ import { es } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/ui/page-header";
 
 interface Cliente {
   id: string;
@@ -214,23 +215,18 @@ export default function ClientsPage() {
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Clientes</h1>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => router.back()}
-            className="px-4 py-2 rounded border hover:bg-gray-50"
-          >
-            Volver
-          </button>
-          <Button
-            onClick={() => { logout(); router.replace("/sign-in"); }}
-            className="px-4 py-2 border hover:bg-gray-50"
-          >
-            Cerrar sesión
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Gestión de Clientes"
+        description="Administra la base de datos de clientes de tu empresa"
+        backUrl="/dashboard"
+      >
+        <Button
+          onClick={() => { logout(); router.replace("/sign-in"); }}
+          className="px-4 py-2 border hover:bg-gray-50"
+        >
+          Cerrar sesión
+        </Button>
+      </PageHeader>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="mb-6 flex gap-2">
